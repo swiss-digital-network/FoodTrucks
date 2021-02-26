@@ -17,6 +17,7 @@ WORKDIR /opt/flask-app
 RUN npm install
 RUN npm run build
 RUN pip3 install -r requirements.txt
+RUN splk-py-trace-bootstrap
 
 # expose port
 EXPOSE 5000
