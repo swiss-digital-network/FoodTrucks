@@ -27,7 +27,7 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v1 
       with:
-        registry: daz2.jfrog.io/daz-srelabs/
+        registry: daz2.jfrog.io
         username: marco.aeberli@swiss-digital-network.ch
         password: ${{ secrets.ARTIFACTORY_PASSWORD }}
     - name: Extract branch name
@@ -37,9 +37,9 @@ jobs:
     - name: Set default docker tag name
       run: |
         if [ "${{ steps.extract_branch.outputs.branch }}" = "master" ]; then
-          echo "::set-output name=tags::maeberlisdn/foodtruck:latest,maeberlisdn/foodtruck:${{ steps.extract_branch.outputs.branch }}-${{ github.run_id }}"
+          echo "::set-output name=tags::daz-srelabs/foodtruck-web:latest,daz-srelabs/foodtruck-web:${{ steps.extract_branch.outputs.branch }}-${{ github.run_id }}"
         else
-          echo "::set-output name=tags::maeberlisdn/foodtruck:${{ steps.extract_branch.outputs.branch }}-${{ github.run_id }}"
+          echo "::set-output name=tags::foodtruck-web:${{ steps.extract_branch.outputs.branch }}-${{ github.run_id }}"
         fi
       id: extract_tags
     - name: Build and push
