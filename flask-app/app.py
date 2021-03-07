@@ -83,7 +83,8 @@ def search():
             body={
                 "query": {"match": {"fooditems": key}},
                 "size": 750  # max document size
-            })
+            },
+            request_timeout=5)
     except Exception as e:
         return make_response(
             jsonify({
