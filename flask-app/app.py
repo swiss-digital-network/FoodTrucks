@@ -1,13 +1,14 @@
 from elasticsearch import Elasticsearch, exceptions
 import os
 import time
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, make_response
 import sys
 import requests
 
 es = Elasticsearch(host='es')
 
 app = Flask(__name__)
+
 
 def load_data_in_es():
     """ creates an index in elasticsearch """
@@ -18,6 +19,7 @@ def load_data_in_es():
     for id, truck in enumerate(data):
         res = es.index(index="sfdata", doc_type="truck", id=id, body=truck)
     print("Total trucks loaded: ", len(data))
+
 
 def safe_check_index(index, retry=10):
     """ connect to ES with retry """
@@ -32,9 +34,11 @@ def safe_check_index(index, retry=10):
         time.sleep(10)
         safe_check_index(index, retry-1)
 
+
 def format_fooditems(string):
     items = [x.strip().lower() for x in string.split(":")]
     return items[1:] if items[0].find("cold truck") > -1 else items
+
 
 def check_and_load_index():
     """ checks if index exits and loads the data accordingly """
@@ -45,9 +49,12 @@ def check_and_load_index():
 ###########
 ### APP ###
 ###########
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/debug')
 def test_es():
@@ -61,6 +68,7 @@ def test_es():
         resp["msg"] = "Unable to reach ES"
     return jsonify(resp)
 
+
 @app.route('/search')
 def search():
     key = request.args.get('q')
@@ -71,16 +79,19 @@ def search():
         })
     try:
         res = es.search(
-                index="sfdata",
-                body={
-                    "query": {"match": {"fooditems": key}},
-                    "size": 750 # max document size
-              })
+            index="sfdata",
+            body={
+                "query": {"match": {"fooditems": key}},
+                "size": 750  # max document size
+            })
     except Exception as e:
-        return jsonify({
-            "status": "failure",
-            "msg": "error in reaching elasticsearch"
-        })
+        return make_response(
+            jsonify({
+                "status": "failure",
+                "msg": "error in reaching elasticsearch"
+            }),
+            500
+        )
     # filtering results
     vendors = set([x["_source"]["applicant"] for x in res["hits"]["hits"]])
     temp = {v: [] for v in vendors}
@@ -89,10 +100,10 @@ def search():
         applicant = r["_source"]["applicant"]
         if "location" in r["_source"]:
             truck = {
-                "hours"    : r["_source"].get("dayshours", "NA"),
-                "schedule" : r["_source"].get("schedule", "NA"),
-                "address"  : r["_source"].get("address", "NA"),
-                "location" : r["_source"]["location"]
+                "hours": r["_source"].get("dayshours", "NA"),
+                "schedule": r["_source"].get("schedule", "NA"),
+                "address": r["_source"].get("address", "NA"),
+                "location": r["_source"]["location"]
             }
             fooditems[applicant] = r["_source"]["fooditems"]
             temp[applicant].append(truck)
@@ -115,6 +126,7 @@ def search():
         "locations": locations,
         "status": "success"
     })
+
 
 if __name__ == "__main__":
     ENVIRONMENT_DEBUG = os.environ.get("DEBUG", False)
