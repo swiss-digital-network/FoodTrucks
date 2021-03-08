@@ -4,6 +4,7 @@ import time
 from flask import Flask, jsonify, request, render_template, make_response
 import sys
 import requests
+import random
 
 es = Elasticsearch(host='es')
 
@@ -108,6 +109,10 @@ def search():
             }
             fooditems[applicant] = r["_source"]["fooditems"]
             temp[applicant].append(truck)
+
+    # build time loop
+    waitTime = random.randint(10, 5000)/1000
+    time.sleep(waitTime)
 
     # building up results
     results = {"trucks": []}
