@@ -21,18 +21,18 @@ def load_data_in_es():
     print("Total trucks loaded: ", len(data))
 
 
-def safe_check_index(index, retry=10):
+def safe_check_index(index, retry=1, max_retry=6):
     """ connect to ES with retry """
-    if not retry:
+    if retry > max_retry:
         print("Out of retries. Bailing out...")
         sys.exit(1)
     try:
-        status = es.indices.exists(index)
+        status = es.indices.exists(index=index)
         return status
     except exceptions.ConnectionError as e:
-        print("Unable to connect to ES. Retrying in 10 secs...")
-        time.sleep(10)
-        safe_check_index(index, retry-1)
+        print('Unable to connect to ES. Retrying in {%d}s with exponential backoff...'.format(2**retry))
+        time.sleep(2**retry)
+        safe_check_index(index, retry+1)
 
 
 def format_fooditems(string):
