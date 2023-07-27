@@ -1,5 +1,5 @@
 # start from base
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL maintainer="Prakhar Srivastav <prakhar@prakhar.me>"
 
@@ -17,7 +17,7 @@ WORKDIR /opt/flask-app
 RUN npm install
 RUN npm run build
 RUN pip3 install -r requirements.txt
-RUN splk-py-trace-bootstrap
+RUN splunk-py-trace-bootstrap
 
 # expose port
 EXPOSE 5000

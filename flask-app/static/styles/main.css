@@ -46,7 +46,7 @@ div.intro {
 }
 
 div.intro h3 {
-  color: #fded39;
+  color: #395dfd;
   text-transform: uppercase;
 }
 
@@ -71,7 +71,7 @@ button {
 }
 
 #sidebar {
-  background: #1a1a1a;
+  background: #4f3232;
   border-left: 1px solid #444444;
   width: 320px;
   flex: 1;
