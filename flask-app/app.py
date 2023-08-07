@@ -1,3 +1,4 @@
+import math
 from elasticsearch import Elasticsearch, exceptions
 import os
 import time
@@ -108,6 +109,16 @@ def search():
             }
             fooditems[applicant] = r["_source"]["fooditems"]
             temp[applicant].append(truck)
+
+    # "Generate a utilization % for a duration of interval seconds"
+    utilization = 95
+    interval = 2
+    start_time = time.time()
+    for i in range(0,int(interval)):
+        while time.time()-start_time < utilization/100.0:
+            a = math.sqrt(64*64*64*64*64)
+        time.sleep(1-utilization/100.0)
+        start_time += 1
 
     # building up results
     results = {"trucks": []}
